@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import Searchbar from "../Searchbar/Searchbar";
-import ImageGallery from "../ImageGallery/ImageGallery";
-import Button from "../Button/Button";
-import Modal from "../Modal/Modal";
+import Searchbar from "./Searchbar/Searchbar";
+import ImageGallery from "./ImageGallery/ImageGallery";
+import Button from "./Button/Button";
+import Modal from "./Modal/Modal";
 import Loader from "react-loader-spinner";
-import fetchPick from "../Fetch/fetch";
+import fetchPick from "./fetch";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
