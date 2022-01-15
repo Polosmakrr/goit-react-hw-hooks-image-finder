@@ -1,42 +1,39 @@
 import s from "./Searchbar.module.css";
-import React, { Component } from "react";
+import React, { useState } from "react";
 import { toast } from "react-toastify";
 
-export class Searchbar extends Component {
-  state = {
-    queryName: "",
+export default function Searchbar({onSubmit}) {
+
+  const [queryName, setQueryName] = useState('');
+
+
+  const handleChange = (e) => {
+    setQueryName(e.target.value);
   };
 
-  handleChange = (e) => {
-    this.setState({ queryName: e.target.value });
-  };
-
-  handleSubmit = (e) => {
+ const handleSubmit = (e) => {
     e.preventDefault();
-    if (this.state.queryName.trim() === "") {
+
+    if (queryName.trim() === "") {
+
       toast.warn(`Введите запрос`);
     } else {
-      this.props.onSubmit(this.state.queryName);
 
-      this.reset();
+      onSubmit(queryName);
+      setQueryName('');
     }
   };
 
-  reset() {
-    this.setState({ queryName: "" });
-  }
-
-  render() {
     return (
       <header className={s.searchbar}>
-        <form className={s.SearchForm} onSubmit={this.handleSubmit}>
+        <form className={s.SearchForm} onSubmit={handleSubmit}>
           <button type="submit" className={s.SearchFormbutton}>
             <span className={s.SearchFormbuttonlabel}>Search</span>
           </button>
 
           <input
-            onChange={this.handleChange}
-            value={this.state.queryName}
+            onChange={handleChange}
+            value={queryName}
             className={s.SearchForminput}
             type="text"
             autoComplete="off"
@@ -46,7 +43,6 @@ export class Searchbar extends Component {
         </form>
       </header>
     );
-  }
+  
 }
 
-export default Searchbar;

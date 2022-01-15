@@ -16,5 +16,5 @@
   max-height: calc(100vh - 24px);
 }
 .image {
-  width: 300px;
+  width: 100%;
 }

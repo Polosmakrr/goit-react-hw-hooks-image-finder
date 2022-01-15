@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useState,useEffect } from "react";
 import Searchbar from "./Searchbar/Searchbar";
 import ImageGallery from "./ImageGallery/ImageGallery";
 import Button from "./Button/Button";
@@ -9,88 +9,84 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 
-export class App extends Component {
-  state = {
-    arrayList: [],
-    queryName: "",
-    page: 1,
-    loading: false,
-    showModal: false,
-    largeImg: "",
-  };
+export default function App() {
+  const [arrayList, setArrayList] = useState([]);
+  const [queryName, setQueryName] = useState('');
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [largeImg, setLargeImg] = useState('');
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.queryName !== this.state.queryName ||
-      prevState.page !== this.state.page
-    ) {
-      this.setState({ loading: true });
-     
-      fetchPick(this.state.queryName,this.state.page)
-        .then((newArray) => {
-          if (newArray.total === 0) {
-            toast.warn(`Ничего не найдено`);
-          } else {
-            this.setState((prevState) => ({
-              arrayList: [...prevState.arrayList, ...newArray.hits],
-            }));
-          }
-        })
-        .catch((error) => toast.error("Oops, something went wrong"))
-        .finally(() => this.setState({ loading: false }));
+  
+  
+  useEffect(() => {
+    if (!queryName) {
+      return
     }
-    if (prevState.arrayList !== this.state.arrayList && this.state.page !== 1) {
-      window.scrollTo({ top: document.body.clientHeight, behavior: "smooth" });
-    }
-  }
+  
+    setLoading(true);
 
-  getLargeImageForModal = (data) => {
-    this.toggleModal();
-    this.setState({ largeImg: data });
+    fetchPick(queryName, page)
+      .then((newArray) => {
+        if (newArray.total === 0) {
+          toast.warn(`Ничего не найдено`);
+        } if(newArray) {
+          setArrayList([...arrayList, ...newArray.hits])
+        }
+        if (page>1) {
+           window.scrollTo({ top: document.body.clientHeight, behavior: "smooth" });
+        }
+      })
+      .catch((error) => toast.error("Oops, something went wrong"))
+      .finally(() => setLoading(false));
+  }, [page, queryName]);
+
+  
+  const getLargeImageForModal = (data) => {
+    toggleModal();
+    setLargeImg(data);
   };
 
-  toggleModal = () => {
-    this.setState((state) => ({
-      showModal: !state.showModal,
-    }));
+  const toggleModal = () => {
+    setShowModal(!showModal);
   };
 
-  handleFormSubmit = (data) => {
-    this.setState({ queryName: data, arrayList: [], page: 1 });
+  const handleFormSubmit = (data) => {
+    setQueryName(data);
+    setArrayList([]);
+    setPage(1);
   };
 
-  handleClikLoadMore = () => {
-    this.setState((prevState) => ({ page: prevState.page + 1 }));
+  const handleClikLoadMore = () => {
+    setPage(page + 1);
   };
 
-  render() {
     return (
       <div>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        {this.state.loading && (
+        <Searchbar onSubmit={handleFormSubmit} />
+        {loading && (
           <Loader type="ThreeDots" color="#00BFFF" height={100} width={100} />
         )}
-        {this.state.arrayList.length !== 0 && (
+        {arrayList.length !== 0 && (
           <ImageGallery
-            modalImageLoad={this.getLargeImageForModal}
-            arrayQueryList={this.state.arrayList}
-            onToggleMenu={this.toggleModal}
+            modalImageLoad={getLargeImageForModal}
+            arrayQueryList={arrayList}
+            onToggleMenu={toggleModal}
           />
         )}
 
-        {this.state.arrayList.length !== 0 && (
-          <Button onClick={this.handleClikLoadMore} />
+        {arrayList.length !== 0 && (
+          <Button onClick={handleClikLoadMore} />
         )}
-        {this.state.showModal && (
+        {showModal && (
           <Modal
-            onToggleMenu={this.toggleModal}
-            modalImage={this.state.largeImg}
+            onToggleMenu={toggleModal}
+            modalImage={largeImg}
           />
         )}
         <ToastContainer />
       </div>
     );
-  }
+  
 }
 
-export default App;
